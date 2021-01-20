@@ -7,6 +7,12 @@
     "description": "Automaticly fills google forms.",
     "homepage_url": "https://github.com/muratalperen/GoogleFormsAutoFiller",
 
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "googleFormsAutoFiller@muratalperen.dev"
+        }
+    },
+
     "icons": {
         "48": "icons/icon-48.png",
         "96": "icons/icon-96.png"
@@ -14,8 +20,7 @@
 
     "permissions": [
         "activeTab",
-        "storage",
-        "tabs"
+        "storage"
     ],
 
     "browser_action": {

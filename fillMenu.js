@@ -19,14 +19,18 @@ function addNewEntry(key = "", val = "") {
         key = "";
     }
     document.getElementsByTagName("tbody")[0].innerHTML += '\
-    <tr>\
-        <td><input type="text" value="' + key + '"></td>\
-        <td><input type="text" value="' + val + '"></td>\
-    </tr>';
+        <tr>\
+            <td><input type="text" value="' + key + '"></td>\
+            <td><input type="text" value="' + val + '"></td>\
+        </tr>';
     return false;
 }
 
 function saveData() {
+    var saveButton = document.getElementById("saveDataButton");
+    var savedText = document.getElementById("savedText");
+    saveButton.disabled = true;
+
     var inputs = document.querySelectorAll('input[type="text"]');
     var formData = {};
     for (var i = 0; i < inputs.length / 2; i++) {
@@ -38,4 +42,13 @@ function saveData() {
     }
 
     chrome.storage.local.set({ "formData": formData });
+
+    saveButton.disabled = false;
+    savedText.style.opacity = 1;
+    var opacityInterval = setInterval(() => {
+        savedText.style.opacity -= 0.01;
+        if (savedText.style.opacity == 0) {
+            clearInterval(opacityInterval);
+        }
+    }, 10);
 }

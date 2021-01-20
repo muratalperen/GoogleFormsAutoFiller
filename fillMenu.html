@@ -4,12 +4,25 @@
 
 <head>
     <meta charset="utf-8">
-    <style type="style/css">
-        html {max-width:400px;} input { width: 100%; } button { margin:auto; }
+    <style>
+        html {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        thead>tr,
+        tfoot>tr {
+            text-align: center;
+        }
+        
+        #savedText {
+            opacity: 0;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
+    <div id="savedText">Saved!</div>
     <table>
         <thead>
             <tr>
@@ -44,7 +57,6 @@
             </tr>
         </tfoot>
     </table>
-
     <script src="fillMenu.js"></script>
 </body>
 

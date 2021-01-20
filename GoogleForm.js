@@ -5,9 +5,14 @@ chrome.storage.local.get("formData", function(result) {
 
     questions.forEach(function(item) {
         var formTitle = item.getAttribute("data-params").match(/"(\s|\w)+",/g)[0].slice(1, -2);
-        if (item.querySelector(".freebirdThemedInput") != null) {
+        if (item.querySelector(".freebirdThemedInput") && formData[formTitle]) { // if it is input is text and answer is exist
             item.querySelector(".freebirdThemedInput").className += " hasValue";
-            item.querySelector("input").value = formData[formTitle];
+
+            if (item.querySelector("input")) {
+                item.querySelector("input").value = formData[formTitle];
+            } else {
+                item.querySelector("textarea").innerHTML = formData[formTitle];
+            }
         }
     })
 });
