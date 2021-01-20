@@ -1,14 +1,28 @@
+document.getElementById("addNewEntryButton").addEventListener("click", addNewEntry, false);
+document.getElementById("saveDataButton").addEventListener("click", saveData, false);
+
 if (localStorage.getItem("formData")) {
     var formData = JSON.parse(localStorage.getItem("formData"));
 } else {
     var formData = {};
-    //localStorage.setItem("formData", JSON.stringify(formData));
+    localStorage.setItem("formData", JSON.stringify(formData));
 }
-
-var formElement = document.querySelector("table");
 
 for (key in formData) {
     addNewEntry(key, formData[key]);
+}
+
+
+function addNewEntry(key = "", val = "") {
+    if (typeof(key) != "string") {
+        key = "";
+    }
+    document.getElementsByTagName("tbody")[0].innerHTML += '\
+    <tr>\
+        <td><input type="text" value="' + key + '"></td>\
+        <td><input type="text" value="' + val + '"></td>\
+    </tr>';
+    return false;
 }
 
 function saveData() {
@@ -23,13 +37,4 @@ function saveData() {
     }
 
     localStorage.setItem("formData", JSON.stringify(formData));
-}
-
-function addNewEntry(key = "", val = "") {
-    console.log("ekle: " + key);
-    formElement.getElementsByTagName("tbody")[0].innerHTML += '\
-    <tr>\
-        <td><input type="text" value="' + key + '"></td>\
-        <td><input type="text" value="' + val + '"></td>\
-    </tr>';
 }
