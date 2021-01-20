@@ -1,15 +1,16 @@
 document.getElementById("addNewEntryButton").addEventListener("click", addNewEntry, false);
 document.getElementById("saveDataButton").addEventListener("click", saveData, false);
-
-if (localStorage.getItem("formData")) {
-    var formData = JSON.parse(localStorage.getItem("formData"));
-} else {
+var formData = {};
+chrome.storage.local.get("formData", function(result) {
+    formData = result["formData"];
+    for (key in formData) {
+        console.log("keyin: " + key);
+        addNewEntry(key, formData[key]);
+    }
+});
+if (!formData) {
     var formData = {};
-    localStorage.setItem("formData", JSON.stringify(formData));
-}
-
-for (key in formData) {
-    addNewEntry(key, formData[key]);
+    chrome.storage.local.set({ "formData": formData });
 }
 
 
@@ -36,5 +37,5 @@ function saveData() {
         }
     }
 
-    localStorage.setItem("formData", JSON.stringify(formData));
+    chrome.storage.local.set({ "formData": formData });
 }
