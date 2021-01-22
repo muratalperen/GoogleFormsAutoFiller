@@ -4,7 +4,6 @@ var formData = {};
 chrome.storage.local.get("formData", function(result) {
     formData = result["formData"];
     for (key in formData) {
-        console.log("keyin: " + key);
         addNewEntry(key, formData[key]);
     }
 });
@@ -35,7 +34,7 @@ function saveData() {
     var formData = {};
     for (var i = 0; i < inputs.length / 2; i++) {
         if (inputs[i * 2].value && inputs[i * 2 + 1].value) {
-            formData[inputs[i * 2].value] = inputs[i * 2 + 1].value;
+            formData[inputs[i * 2].value] = inputs[i * 2 + 1].value.trim();
         } else {
             inputs[i * 2].parentNode.parentNode.remove();
         }

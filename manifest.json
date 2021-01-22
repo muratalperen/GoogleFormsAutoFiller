@@ -4,16 +4,17 @@
     "name": "Google Forms Auto Filler",
     "version": "0.1",
 
-    "description": "Automaticly fills google forms.",
+    "description": "Automatically fills google forms.",
     "homepage_url": "https://github.com/muratalperen/GoogleFormsAutoFiller",
 
     "browser_specific_settings": {
         "gecko": {
-            "id": "googleFormsAutoFiller@muratalperen.dev"
+            "id": "googleFormsAutoFiller@muratalperen"
         }
     },
 
     "icons": {
+	"32": "icons/icon-32.png",
         "48": "icons/icon-48.png",
         "96": "icons/icon-96.png"
     },
