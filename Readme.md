@@ -1,6 +1,6 @@
 # Google Forms Auto Filler
 
-![Google Forms Auto Filler Screenshot](Add-on Screenshot.png)
+![Google Forms Auto Filler Screenshot](Add-on\ Screenshot.png)
 
 This add-on enters text into input fields of Google Forms by predefined values automatically. For example if you set *Name* as *John*, each input fields of Google Forms whose title is *Name* gets *John* value when the page is loaded. 
 
