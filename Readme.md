@@ -15,9 +15,7 @@ zip -r -FS ../GoogleFormsAutoFiller.zip * --exclude '*.git*' Add-on\ Screenshot.
 
 ### TODO
 
-When save button pressed, run auto filling code with new entries
-Add option
+Add option autoselect
 Add style to popup window.
-Add feature: fill by title-key similarity
-
-https://chrome.google.com/webstore/devconsole
+Add feature: fill by title-label similarity
+Add feature: save this form questions
