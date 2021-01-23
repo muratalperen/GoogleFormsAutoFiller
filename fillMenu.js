@@ -1,5 +1,7 @@
 document.getElementById("addNewEntryButton").addEventListener("click", addNewEntry, false);
 document.getElementById("saveDataButton").addEventListener("click", saveData, false);
+
+// List form datas
 var formData = {};
 chrome.storage.local.get("formData", function(result) {
     formData = result["formData"];
@@ -17,10 +19,17 @@ function addNewEntry(key = "", val = "") {
     if (typeof(key) != "string") {
         key = "";
     }
+
+    // Fix for the problem of deleting when a new entry is insert
+    var currInputs = document.querySelectorAll('input[type="text"]');
+    for (var i = 0; i < currInputs.length; i++) {
+        currInputs[i].setAttribute("value", currInputs[i].value);
+    }
+
     document.getElementsByTagName("tbody")[0].innerHTML += '\
         <tr>\
-            <td><input type="text" value="' + key + '"></td>\
-            <td><input type="text" value="' + val + '"></td>\
+            <td><input type="text" value="' + key.trim() + '"></td>\
+            <td><input type="text" value="' + val.trim() + '"></td>\
         </tr>';
     return false;
 }
@@ -41,6 +50,10 @@ function saveData() {
     }
 
     chrome.storage.local.set({ "formData": formData });
+
+    chrome.tabs.executeScript({
+        code: "FillGoogleForms();"
+    });
 
     saveButton.disabled = false;
     savedText.style.opacity = 1;
