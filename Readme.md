@@ -9,13 +9,13 @@ Get it on add-on stores:
 + Chrome: Coming soon
 + Opera: Coming soon
 
-### Built
+### Build
 
-zip -r -FS ../GoogleFormsAutoFiller.zip * --exclude '*.git*' Add-on\ Screenshot.png
+`zip -r -FS ../GoogleFormsAutoFiller.zip * --exclude '*.git*' Add-on\ Screenshot.png`
 
-### TODO
+### Todo
 
-Add option autoselect
-Add style to popup window.
-Add feature: fill by title-label similarity
-Add feature: save this form questions
++ Add option autoselect
++ Add style to popup window.
++ Add feature: fill by title-label similarity
++ Add feature: save this form questions
