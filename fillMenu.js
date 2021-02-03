@@ -16,7 +16,6 @@ var langLib = {
         "save": "Kaydet"
     }
 }
-var a = "";
 
 window.onload = function() {
     // Set language
@@ -35,9 +34,8 @@ window.onload = function() {
 
     // List form datas
     var formData = {};
-    chrome.storage.local.get("formData", function(result) {
+    chrome.storage.sync.get("formData", function(result) {
         formData = result["formData"];
-        a = formData;
         if (objectIsEmpty(formData)) {
             addNewEntry();
         } else {
@@ -46,27 +44,23 @@ window.onload = function() {
             }
         }
     });
-
-    // If form data doesn't exist create one
-    if (objectIsEmpty(formData["formData"])) {
-        var formData = {};
-        chrome.storage.local.set({ "formData": formData });
-    }
 }
 
 function setLanguage(langEvent = null) {
-    chrome.storage.local.get("language", function(result) {
+    chrome.storage.sync.get("language", function(result) {
         var lang = "en"; // default language is english
         if (langEvent) { // if lang set by button
             lang = langEvent.srcElement.value;
-        } else if (objectIsEmpty(result["language"])) { // if lang set before
+        } else if (!objectIsEmpty(result["language"])) { // if lang set before
             lang = result["language"];
         }
 
         var currentLanguage = langLib[lang];
         var textElements = document.querySelectorAll("[data-lang]");
 
-        chrome.storage.local.set({ "language": lang });
+        chrome.storage.sync.set({ "language": lang }, function() {
+            console.log("Language set: " + lang);
+        });
         for (var i = 0; i < textElements.length; i++) {
             textElements[i].innerHTML = currentLanguage[textElements[i].getAttribute("data-lang")];
         }
@@ -86,8 +80,8 @@ function addNewEntry(key = "", val = "") {
 
     document.getElementsByTagName("tbody")[0].innerHTML += '\
         <tr>\
-            <td><input type="text" value="' + key.trim() + '"></td>\
-            <td><input type="text" value="' + val.trim() + '"></td>\
+            <td><input type="text" value="' + key + '"></td>\
+            <td><input type="text" value="' + val + '"></td>\
         </tr>';
     return false;
 }
@@ -101,13 +95,15 @@ function saveData() {
     var formData = {};
     for (var i = 0; i < inputs.length / 2; i++) {
         if (inputs[i * 2].value && inputs[i * 2 + 1].value) {
-            formData[inputs[i * 2].value] = inputs[i * 2 + 1].value.trim();
+            formData[inputs[i * 2].value.trim()] = inputs[i * 2 + 1].value.trim();
         } else {
             inputs[i * 2].parentNode.parentNode.remove();
         }
     }
 
-    chrome.storage.local.set({ "formData": formData });
+    chrome.storage.sync.set({ "formData": formData }, function() {
+        console.log("Form data saved: " + formData);
+    });
 
     chrome.tabs.executeScript({
         code: "FillGoogleForms();"

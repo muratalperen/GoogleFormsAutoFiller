@@ -1,6 +1,6 @@
 function FillGoogleForms() {
     console.log("runne");
-    chrome.storage.local.get("formData", function(result) {
+    chrome.storage.sync.get("formData", function(result) {
 
         formData = result["formData"];
 

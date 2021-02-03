@@ -1,17 +1,17 @@
 # Google Forms Auto Filler
 
-![Google Forms Auto Filler Screenshot](Add-on%20Screenshot.png)
+![Google Forms Auto Filler Screenshot](build/Screenshots/Add-on%20Screenshot.png)
 
 This add-on enters text into input fields of Google Forms by predefined values automatically. For example if you set *Name* as *John*, each input fields of Google Forms whose title is *Name* gets *John* value when the page is loaded. 
 
 Get it on add-on stores:
 + Firefox: <https://addons.mozilla.org/en-US/firefox/addon/google-forms-auto-filler/>
-+ Chrome: Coming soon
++ Chrome: <https://chrome.google.com/webstore/detail/google-forms-auto-filler/jdjlkmjjmpdbmejkicfjokkgifdkpjek>
 + Opera: Coming soon
 
 ### Build
 
-`zip -r -FS ../GoogleFormsAutoFiller.zip * --exclude '*.git*' Add-on\ Screenshot.png`
+`zip -r -FS build/Chrome/GoogleFormsAutoFiller.zip * --exclude '*.git*' 'build/*'`
 
 ### Todo
 
