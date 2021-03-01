@@ -1,5 +1,4 @@
 function FillGoogleForms() {
-    console.log("runne");
     chrome.storage.sync.get("formData", function(result) {
 
         formData = result["formData"];
@@ -9,12 +8,14 @@ function FillGoogleForms() {
         questions.forEach(function(item) {
             var formTitle = item.getAttribute("data-params").split(",")[1].slice(1, -1);
             var answer = formData[formTitle.trim()];
-            console.log("data:" + formTitle.trim() + " ve " + answer)
-            if (item.querySelector(".freebirdThemedInput") && answer) { // if it is input is text and answer is exist
+            if (item.querySelector(".freebirdThemedInput") && answer) { // if the input is text and answer is exist
                 item.querySelector(".freebirdThemedInput").className += " hasValue";
 
                 if (item.querySelector("input")) {
                     item.querySelector("input").value = answer;
+                    item.querySelector("input").setAttribute("value", answer);
+                    item.querySelector("input").setAttribute("data-initial-value", answer);
+                    item.querySelector("input").setAttribute("badinput", "false");
                 } else {
                     item.querySelector("textarea").innerHTML = answer;
                 }
