@@ -17,7 +17,7 @@ function FillGoogleForms() {
                     item.querySelector("input").setAttribute("data-initial-value", answer);
                     item.querySelector("input").setAttribute("badinput", "false");
                 } else {
-                    item.querySelector("textarea").innerHTML = answer;
+                    item.querySelector("textarea").textContent = answer;
                 }
             }
         })

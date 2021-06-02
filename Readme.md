@@ -9,7 +9,7 @@ IMPORTANT Note: Because of the Google Forms bot filling blocking, you must click
 Get it on add-on stores:
 + Firefox: <https://addons.mozilla.org/en-US/firefox/addon/google-forms-auto-filler/>
 + Chrome: <https://chrome.google.com/webstore/detail/google-forms-auto-filler/jdjlkmjjmpdbmejkicfjokkgifdkpjek>
-+ Opera: Coming soon ([Maybe never](https://forums.opera.com/topic/16609/very-long-extension-moderation-process))
++ Opera: <https://addons.opera.com/en/extensions/details/google-forms-auto-filler/>
 
 ### Build
 
