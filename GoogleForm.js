@@ -1,11 +1,15 @@
+/**
+* Fills inputs on forms page with the data
+*/
 function FillGoogleForms() {
     chrome.storage.sync.get("formData", function(result) {
-
         formData = result["formData"];
-
-        var questions = document.querySelectorAll("div.m2");
-
-        questions.forEach(function(item) {
+        var FormElement = document.getElementsByTagName("form")[0];
+        
+        // Fill text fields
+        var selectorStr = "input[type='text'], input[type='email'], input[type='number'], input[type='tel'], input[type='url']";
+        var fields = FormElement.querySelectorAll(selectorStr);
+        fields.forEach(function(item) {
             var formTitle = item.getAttribute("data-params").split(",")[1].slice(1, -1);
             var answer = formData[formTitle.trim()];
             if (item.querySelector(".freebirdThemedInput") && answer) { // if the input is text and answer is exist
@@ -20,7 +24,11 @@ function FillGoogleForms() {
                     item.querySelector("textarea").textContent = answer;
                 }
             }
-        })
+        });
+
+        // Fill textareas
+
+        
     });
 }
 

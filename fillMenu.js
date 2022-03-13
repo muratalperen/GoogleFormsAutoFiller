@@ -1,30 +1,9 @@
-var langLib = {
-    "en": {
-        "title": "Google Forms Auto Filler",
-        "label": "Label",
-        "value": "Value",
-        "saved": "Saved",
-        "add": "Add",
-        "save": "Save"
-    },
-    "tr": {
-        "title": "Google Forms Doldurucu",
-        "label": "Başlık",
-        "value": "Cevap",
-        "saved": "Kaydedildi",
-        "add": "Ekle",
-        "save": "Kaydet"
-    }
-}
-
 window.onload = function() {
-    // Set language
-    setLanguage();
 
     // Add click listeners to language buttons
     var langButtons = document.querySelectorAll("#selectLang>input");
     for (var i = 0; i < langButtons.length; i++) {
-        langButtons[i].addEventListener("click", setLanguage, false);
+        langButtons[i].addEventListener("click", setLanguageByButton, false);
     }
 
 
@@ -32,10 +11,12 @@ window.onload = function() {
     document.getElementById("addNewEntryButton").addEventListener("click", addNewEntry, false);
     document.getElementById("saveDataButton").addEventListener("click", saveData, false);
 
-    // List form datas
+
+    // List saved form data
     var formData = {};
     chrome.storage.sync.get("formData", function(result) {
         formData = result["formData"];
+
         if (objectIsEmpty(formData)) {
             addNewEntry();
         } else {
@@ -46,29 +27,15 @@ window.onload = function() {
     });
 }
 
-function setLanguage(langEvent = null) {
-    chrome.storage.sync.get("language", function(result) {
-        var lang = "en"; // default language is english
-        if (langEvent) { // if lang set by button
-            lang = langEvent.srcElement.value;
-        } else if (!objectIsEmpty(result["language"])) { // if lang set before
-            lang = result["language"];
-        }
 
-        var currentLanguage = langLib[lang];
-        var textElements = document.querySelectorAll("[data-lang]");
 
-        chrome.storage.sync.set({ "language": lang }, function() {
-            console.log("Language set: " + lang);
-        });
-        for (var i = 0; i < textElements.length; i++) {
-            textElements[i].innerHTML = currentLanguage[textElements[i].getAttribute("data-lang")];
-        }
-    });
-}
-
+/**
+* Adds row to table for a key & value couple
+* @param    {String} key    Key data
+* @param    {String} val    Value data
+*/
 function addNewEntry(key = "", val = "") {
-    if (typeof(key) != "string") {
+    if (typeof(key) != "string") { //?
         key = "";
     }
 
@@ -86,11 +53,17 @@ function addNewEntry(key = "", val = "") {
     return false;
 }
 
+
+
+/**
+* Saves the data on table
+*/
 function saveData() {
     var saveButton = document.getElementById("saveDataButton");
     var savedText = document.getElementById("savedText");
     saveButton.disabled = true;
 
+    // Get datas from inputs and remove empty inputs
     var inputs = document.querySelectorAll('input[type="text"]');
     var formData = {};
     for (var i = 0; i < inputs.length / 2; i++) {
@@ -101,14 +74,18 @@ function saveData() {
         }
     }
 
+    // Save data
     chrome.storage.sync.set({ "formData": formData }, function() {
         console.log("Form data saved: " + formData);
+        
+        // Fill forms with new data
+        chrome.tabs.executeScript({
+            code: "FillGoogleForms();"
+        });
     });
 
-    chrome.tabs.executeScript({
-        code: "FillGoogleForms();"
-    });
 
+    // Saved text animation
     saveButton.disabled = false;
     savedText.style.opacity = 1;
     var opacityInterval = setInterval(() => {
@@ -120,14 +97,18 @@ function saveData() {
 }
 
 
+
+/**
+* Checks if parameter object is empty, null etc.
+* @param    {String} object  Object to be checked
+* @return   {String}         Is empty
+*/
 function objectIsEmpty(object) {
-    var isEmpty = true;
-    if (!object) {
+    var isEmpty = false;
+    
+    if (!object || JSON.stringify(object) == JSON.stringify({})) {
         isEmpty = true;
-    } else if (JSON.stringify(object) == JSON.stringify({})) {
-        isEmpty = true;
-    } else {
-        isEmpty = false;
     }
+
     return isEmpty;
 }
