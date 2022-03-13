@@ -10,18 +10,28 @@ function FillGoogleForms() {
         var selectorStr = "input[type='text'], input[type='email'], input[type='number'], input[type='tel'], input[type='url']";
         var fields = FormElement.querySelectorAll(selectorStr);
         fields.forEach(function(item) {
-            var formTitle = item.getAttribute("data-params").split(",")[1].slice(1, -1);
+            var formTitle = item.closest("div[role='listitem']").querySelector("div[role='heading']").firstChild.textContent;
             var answer = formData[formTitle.trim()];
-            if (item.querySelector(".freebirdThemedInput") && answer) { // if the input is text and answer is exist
-                item.querySelector(".freebirdThemedInput").className += " hasValue";
+            if (answer) {
+                item.value = answer;
+                //item.setAttribute("value", answer);
+                item.setAttribute("data-initial-value", answer);
+                item.setAttribute("badinput", "false");
+                // TODO: find the class that hides input inside text by reversed css finding
+                item.nextElementSibling.style.display = "none";
 
-                if (item.querySelector("input")) {
-                    item.querySelector("input").value = answer;
-                    item.querySelector("input").setAttribute("value", answer);
-                    item.querySelector("input").setAttribute("data-initial-value", answer);
-                    item.querySelector("input").setAttribute("badinput", "false");
-                } else {
-                    item.querySelector("textarea").textContent = answer;
+                // Idk what it is but smt changing:
+                try{
+                    var idmsi = 0;
+                    for(let i=0; i<FB_PUBLIC_LOAD_DATA_[1][1].length; i++){
+                        if(FB_PUBLIC_LOAD_DATA_[1][1][i][1] == formTitle){
+                            idmsi = FB_PUBLIC_LOAD_DATA_[1][1][i][4][0][0];
+                        }
+                    }
+                    document.querySelector("input[name='entry." + idmsi + "']").value = answer;
+                }
+                catch(err){
+                    console.log("Load data error");
                 }
             }
         });
@@ -31,5 +41,6 @@ function FillGoogleForms() {
         
     });
 }
+
 
 window.onload = FillGoogleForms();
