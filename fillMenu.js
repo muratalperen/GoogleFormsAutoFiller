@@ -8,7 +8,7 @@ window.onload = function() {
 
 
     // Add click listeners to add and save button
-    document.getElementById("addNewEntryButton").addEventListener("click", addNewEntry, false);
+    document.getElementById("addNewEntryButton").addEventListener("click", addNewEntryButton, false);
     document.getElementById("saveDataButton").addEventListener("click", saveData, false);
 
 
@@ -30,26 +30,40 @@ window.onload = function() {
 
 
 /**
+* Adds clear row on button click
+*/
+function addNewEntryButton(mouseEvent){
+    addNewEntry();
+}
+
+
+
+/**
 * Adds row to table for a key & value couple
 * @param    {String} key    Key data
 * @param    {String} val    Value data
 */
 function addNewEntry(key = "", val = "") {
-    if (typeof(key) != "string") { //?
-        key = "";
-    }
+    // Create input row
+    var theRow = document.createElement("tr");
+    var theRow = document.getElementsByTagName("tbody")[0].appendChild(theRow);
 
-    // Fix for the problem of deleting when a new entry is insert
-    var currInputs = document.querySelectorAll('input[type="text"]');
-    for (var i = 0; i < currInputs.length; i++) {
-        currInputs[i].setAttribute("value", currInputs[i].value);
-    }
+    // Create key input
+    var tdK = document.createElement("td");
+    theRow.appendChild(tdK);
+    var inpK = document.createElement("input");
+    inpK.type = "text";
+    inpK.value = key;
+    tdK.appendChild(inpK);
 
-    document.getElementsByTagName("tbody")[0].innerHTML += '\
-        <tr>\
-            <td><input type="text" value="' + key + '"></td>\
-            <td><input type="text" value="' + val + '"></td>\
-        </tr>';
+    // Create value input
+    var tdV = document.createElement("td");
+    theRow.appendChild(tdV);
+    var inpV = document.createElement("input");
+    inpV.type = "text";
+    inpV.value = val;
+    tdV.appendChild(inpV);
+
     return false;
 }
 
