@@ -17,7 +17,6 @@ Get it on add-on stores:
 
 ### Todo
 
-+ Fix textarea
 + Inject more safe way
 + Add option autoselect
 + Make locale by i18n

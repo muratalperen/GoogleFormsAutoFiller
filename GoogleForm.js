@@ -14,13 +14,12 @@ function FillGoogleForms() {
             var answer = formData[formTitle.trim()];
             if (answer) {
                 item.value = answer;
-                //item.setAttribute("value", answer);
                 item.setAttribute("data-initial-value", answer);
                 item.setAttribute("badinput", "false");
                 // TODO: find the class that hides input inside text by reversed css finding
                 item.nextElementSibling.style.display = "none";
 
-                // Idk what it is but smt changing:
+                /* Idk what it is but something in hidden inputs changing
                 try{
                     var idmsi = 0;
                     for(let i=0; i<FB_PUBLIC_LOAD_DATA_[1][1].length; i++){
@@ -31,12 +30,26 @@ function FillGoogleForms() {
                     document.querySelector("input[name='entry." + idmsi + "']").value = answer;
                 }
                 catch(err){
-                    console.log("Load data error");
-                }
+                    console.log("Load data error: " + err);
+                }*/
             }
         });
 
+
         // Fill textareas
+        var fields = FormElement.querySelectorAll("textarea");
+        fields.forEach(function(item) {
+            var formTitle = item.closest("div[role='listitem']").querySelector("div[role='heading']").firstChild.textContent;
+            var answer = formData[formTitle.trim()];
+            if (answer) {
+                item.value = answer;
+                item.setAttribute("data-initial-value", answer);
+                item.setAttribute("badinput", "false");
+                // TODO: find the class that hides input inside text by reversed css finding
+                item.parentElement.previousElementSibling.style.display = "none";
+            }
+        });
+
 
         
     });
