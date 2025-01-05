@@ -1,10 +1,10 @@
 {
 
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Google Forms Auto Filler",
-    "version": "0.2.3",
+    "version": "0.9",
 
-    "description": "Automatically fills google forms.",
+    "description": "Automatically fills google forms. You can save your answers and it fills the form with your answers.",
     "homepage_url": "https://github.com/muratalperen/GoogleFormsAutoFiller",
 
     "browser_specific_settings": {
@@ -24,15 +24,26 @@
         "storage"
     ],
 
-    "browser_action": {
+    "action": {
         "default_icon": "icons/icon-32.png",
         "default_title": "Google Forms Auto Filler",
-        "default_popup": "fillMenu.html"
+        "default_popup": "popup/menu.html"
     },
 
-    "content_scripts": [{
-        "matches": ["*://docs.google.com/forms/*"],
-        "js": ["GoogleForm.js"]
-    }]
+    
+"content_scripts": [
+    {
+      "matches": ["*://docs.google.com/forms/*"],
+      "js": [
+        "./scripts/GoogleForm.js",
+        "./scripts/Handlers.js",
+        "./scripts/LevenshteinSimilarity.js"
+      ]
+    }
+  ],
+
+    "host_permissions": [
+        "https://docs.google.com/*"
+    ]
 
 }
