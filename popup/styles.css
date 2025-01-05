@@ -1,0 +1,134 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Logo ve başlık arasında boşluk */
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 40px; /* Logonun genişliği */
+    height: 40px; /* Logonun yüksekliği */
+    object-fit: contain; /* Logonun düzgün ölçeklenmesi */
+}
+
+h1 {
+    color: #333;
+    margin: 0;
+    font-size: 1.5rem;
+    flex: 1; /* Başlığın kalan alanı doldurması */
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+    font-size: 14px;
+}
+
+.key-input {
+    max-width: 40%;
+}
+
+.value-input {
+    max-width: 50%;
+}
+
+button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #e63939;
+}
+
+#addRowBtn {
+    background-color: #4CAF50;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+#addRowBtn:hover {
+    background-color: #45a049;
+}
+
+.remove-btn {
+    background-color: #ff4d4d;
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-btn {
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#donate-btn {
+    background-color: #ffd700;
+    color: black;
+}
+
+#donate-btn:hover {
+    background-color: #e6c200;
+}
+
+#share-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#share-btn:hover {
+    background-color: #45a049;
+}
+
+#info-btn {
+    background-color: #007BFF;
+    color: white;
+}
+
+#info-btn:hover {
+    background-color: #0056b3;
+}

@@ -1,113 +1,93 @@
+//chrome.runtime.connect({ name: "googleautoformfillerPopup" });
 window.onload = function() {
+    document.getElementById("addRowBtn").addEventListener("click", () => AddNewEntry());
+    document.getElementById("donate-btn").addEventListener("click", () => window.open("#", "_blank"));
+    document.getElementById("share-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller", "_blank"));
+    document.getElementById("info-btn").addEventListener("click", () => window.open("#", "_blank"));
 
-    // Add click listeners to language buttons
-    var langButtons = document.querySelectorAll("#selectLang>input");
-    for (var i = 0; i < langButtons.length; i++) {
-        langButtons[i].addEventListener("click", setLanguageByButton, false);
-    }
-
-
-    // Add click listeners to add and save button
-    document.getElementById("addNewEntryButton").addEventListener("click", addNewEntryButton, false);
-    document.getElementById("saveDataButton").addEventListener("click", saveData, false);
+    DisplayData();
+}
 
 
-    // List saved form data
-    var formData = {};
+/**
+ * Adds a new row to the form using the template
+ * @param {String} key Key data
+ * @param {String} val Value data
+ */
+function AddNewEntry(key = "", val = "") {
+    const template = document.getElementById("formRowTemplate");
+    const formElement = document.getElementById("formData");
+
+    // Clone the template content
+    const newRow = template.content.cloneNode(true);
+
+    const inputs = newRow.querySelectorAll("input");
+    inputs[0].value = key;
+    inputs[1].value = val;
+    inputs[0].addEventListener("change", SaveData);
+    inputs[1].addEventListener("change", SaveData);
+
+    // Add remove functionality to the button
+    const removeButton = newRow.querySelector(".remove-btn");
+    removeButton.addEventListener("click", () => {
+        removeButton.parentElement.remove();
+        SaveData();
+    });
+
+    // Append the new row to the form
+    formElement.appendChild(newRow);
+    SaveData();
+}
+
+
+/**
+* Saves the data on table to chrome storage
+*/
+function SaveData() {
+    const rows = document.querySelectorAll('.form-row'); // Select all form rows
+    const formData = {};
+
+    rows.forEach(row => {
+        const keyInput = row.querySelector('input[name="key[]"]');
+        const valueInput = row.querySelector('input[name="value[]"]');
+
+        // If both key and value inputs have values, save them
+        if (keyInput.value.trim() && valueInput.value.trim()) {
+            formData[keyInput.value.trim()] = valueInput.value.trim();
+        }
+    });
+
+    // Save data and fill the forms
+    chrome.storage.sync.set({ "formData": formData }, FillGoogleForms);
+}
+
+/**
+ * Displays the data on the table
+ */
+function DisplayData() {
     chrome.storage.sync.get("formData", function(result) {
-        formData = result["formData"];
-
+        const formData = result["formData"];
+        console.log("formData");
         if (objectIsEmpty(formData)) {
-            addNewEntry();
+            AddNewEntry(); // Add an empty row if there is no data
         } else {
             for (key in formData) {
-                addNewEntry(key, formData[key]);
+                AddNewEntry(key, formData[key]);
             }
         }
     });
 }
 
 
-
 /**
-* Adds clear row on button click
-*/
-function addNewEntryButton(mouseEvent){
-    addNewEntry();
-}
-
-
-
-/**
-* Adds row to table for a key & value couple
-* @param    {String} key    Key data
-* @param    {String} val    Value data
-*/
-function addNewEntry(key = "", val = "") {
-    // Create input row
-    var theRow = document.createElement("tr");
-    var theRow = document.getElementsByTagName("tbody")[0].appendChild(theRow);
-
-    // Create key input
-    var tdK = document.createElement("td");
-    theRow.appendChild(tdK);
-    var inpK = document.createElement("input");
-    inpK.type = "text";
-    inpK.value = key;
-    tdK.appendChild(inpK);
-
-    // Create value input
-    var tdV = document.createElement("td");
-    theRow.appendChild(tdV);
-    var inpV = document.createElement("input");
-    inpV.type = "text";
-    inpV.value = val;
-    tdV.appendChild(inpV);
-
-    return false;
-}
-
-
-
-/**
-* Saves the data on table
-*/
-function saveData() {
-    var saveButton = document.getElementById("saveDataButton");
-    var savedText = document.getElementById("savedText");
-    saveButton.disabled = true;
-
-    // Get datas from inputs and remove empty inputs
-    var inputs = document.querySelectorAll('input[type="text"]');
-    var formData = {};
-    for (var i = 0; i < inputs.length / 2; i++) {
-        if (inputs[i * 2].value && inputs[i * 2 + 1].value) {
-            formData[inputs[i * 2].value.trim()] = inputs[i * 2 + 1].value.trim();
-        } else {
-            inputs[i * 2].parentNode.parentNode.remove();
-        }
-    }
-
-    // Save data
-    chrome.storage.sync.set({ "formData": formData }, function() {
-        console.log("Form data saved: " + formData);
-        
-        // Fill forms with new data
-        chrome.tabs.executeScript({
-            code: "FillGoogleForms();"
+ * Fills the google forms with the data
+ */
+function FillGoogleForms() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'FillGoogleForms' }, (response) => {
+          //console.log(response.status);
         });
     });
-
-
-    // Saved text animation
-    saveButton.disabled = false;
-    savedText.style.opacity = 1;
-    var opacityInterval = setInterval(() => {
-        savedText.style.opacity -= 0.01;
-        if (savedText.style.opacity == 0) {
-            clearInterval(opacityInterval);
-        }
-    }, 10);
 }
 
 

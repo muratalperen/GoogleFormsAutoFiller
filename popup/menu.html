@@ -1,71 +1,38 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <style>
-        html {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #202124;
-        }
-        
-        thead>tr,
-        tfoot>tr {
-            text-align: center;
-        }
-        
-        #savedText {
-            opacity: 0;
-            text-align: center;
-        }
-        
-        ul {
-            margin: 0px;
-            padding: 0px;
-        }
-        
-        ul>li {
-            display: inline-block;
-        }
-        
-        #title {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        
-        #selectLang {
-            float: right;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Forms Auto Filler</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <div id="savedText" data-lang="saved"></div>
-    <table>
-        <thead>
-            <tr>
-                <td data-lang="label"></td>
-                <td data-lang="value"></td>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="container">
+        <div class="header">
+            <img src="../images/icon-96.png" alt="Logo" class="logo">
+            <h1>Google Forms Auto Filler</h1>
+        </div>
 
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>
-                    <button type="button" id="addNewEntryButton" data-lang="add">
-                    </button>
-                </td>
-                <td>
-                    <button type="button" id="saveDataButton" data-lang="save">
-                    </button>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+        <div id="formData">
+            <!-- Template for a row -->
+            <template id="formRowTemplate">
+                <div class="form-row">
+                    <input type="text" name="key[]" placeholder="Key" class="key-input" />
+                    <input type="text" name="value[]" placeholder="Value" class="value-input" />
+                    <button type="button" class="remove-btn">-</button>
+                </div>
+            </template>
+        </div>        
+        <button id="addRowBtn">+ Add New</button>
+        <br>
+
+        <div class="footer">
+            <button class="footer-btn" id="donate-btn">💰 Donate</button>
+            <button class="footer-btn" id="share-btn">🔗 Github</button>
+            <button class="footer-btn" id="info-btn">ℹ️ Info</button>
+        </div>
+    </div>
+
     <script src="menu.js"></script>
 </body>
-
 </html>
