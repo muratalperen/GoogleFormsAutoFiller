@@ -1,8 +1,7 @@
 {
-
     "manifest_version": 3,
     "name": "Google Forms Auto Filler",
-    "version": "0.9",
+    "version": "0.9.9",
 
     "description": "Automatically fills google forms. You can save your answers and it fills the form with your answers.",
     "homepage_url": "https://github.com/muratalperen/GoogleFormsAutoFiller",

@@ -1,9 +1,9 @@
 //chrome.runtime.connect({ name: "googleautoformfillerPopup" });
 window.onload = function() {
     document.getElementById("addRowBtn").addEventListener("click", () => AddNewEntry());
-    document.getElementById("donate-btn").addEventListener("click", () => window.open("#", "_blank"));
+    document.getElementById("donate-btn").addEventListener("click", () => window.open("https://buymeacoffee.com/muratserhatalperen", "_blank"));
     document.getElementById("share-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller", "_blank"));
-    document.getElementById("info-btn").addEventListener("click", () => window.open("#", "_blank"));
+    document.getElementById("info-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller/blob/master/Readme.md", "_blank"));
 
     DisplayData();
 }
