@@ -18,6 +18,10 @@ Get it on add-on stores:
 ### Todo
 
 + Date, time, multiplechoice autofill
-+ Make locale by i18n
++ Make locale by i18n (priority by usage: India, Indonesia, Turkey, Vietnam, Spanish)
 + Find a way to import Handler and LevenshteinSimilarity as a package
 + Add visual to form: Save this form answer button and highlight the fields filled by extension
+
+### Support
+
+Feel free to [donate](https://buymeacoffee.com/muratserhatalperen) to support me in adding more features!
