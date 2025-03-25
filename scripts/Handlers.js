@@ -14,13 +14,30 @@ export const Handlers = {
             element.dispatchEvent(new Event('input', { bubbles: true }));
             element.dispatchEvent(new Event('change', { bubbles: true }));
         }
+    },
+    date: {
+        selector: "input[type='date']",
+        fill: (element, answer) => {
+            // Ensure the date is in YYYY-MM-DD format for HTML date input
+            let formattedDate = answer;
+            
+            // Check if the answer is in DD/MM/YYYY or MM/DD/YYYY format and convert to YYYY-MM-DD
+            if (answer.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
+                const parts = answer.split(/[\/\-\.]/);
+                // Assuming DD/MM/YYYY format - adjust as needed for your locale
+                formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            } else if (answer.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
+                const parts = answer.split(/[\/\-\.]/);
+                // Assuming MM/DD/YYYY format
+                formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+            }
+            
+            // Set the value and dispatch events
+            element.value = formattedDate;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        }
     }
-    // date: {
-    //     selector: "input[type='date']",
-    //     fill: (element, answer) => {
-    //         element.value = answer; // YYYY-MM-DD formatını kontrol et
-    //     }
-    // },
     // time: {
     //     selector: "input[type='time']",
     //     fill: (element, answer) => {
