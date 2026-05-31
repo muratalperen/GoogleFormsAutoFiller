@@ -24,4 +24,4 @@ Get it on add-on stores:
 
 ### Support
 
-Feel free to [donate](https://buymeacoffee.com/muratserhatalperen) to support me in adding more features!
+Feel free to [donate]([https://buymeacoffee.com/muratserhatalperen](https://docs.google.com/forms/d/e/1FAIpQLSdCxKro2ky3hbM-3HFymsW-u7kJ3hyQiL7IsdniLAcCClxZ7Q/viewform?usp=header)) to support me in adding more features!
