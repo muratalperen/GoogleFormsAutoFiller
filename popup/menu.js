@@ -123,8 +123,38 @@ window.onload = function() {
         }
     });
 
+    // Date-format setting
+    setupDateFormatSetting();
+
     GFAFStorage.migrateSyncToLocal(() => {
         DisplayData();
+    });
+}
+
+/**
+ * Populate the date-format select from stored settings and persist on change.
+ */
+function setupDateFormatSetting() {
+    const select = document.getElementById("dateFormat");
+    if (!select) return;
+
+    GFAFStorage.getSettings((error, settings) => {
+        select.value = (settings && settings.dateFormat) || "DMY";
+    });
+
+    select.addEventListener("change", function() {
+        GFAFStorage.setSettings({ dateFormat: select.value }, (error) => {
+            if (error) {
+                showStatus("Failed to save setting: " + error.message, false);
+                return;
+            }
+            // Re-fill the active Google Forms tab so the new format applies.
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0] && tabs[0].url && tabs[0].url.includes("docs.google.com/forms")) {
+                    FillGoogleForms();
+                }
+            });
+        });
     });
 }
 
