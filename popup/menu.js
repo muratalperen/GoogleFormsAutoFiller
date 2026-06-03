@@ -1,6 +1,13 @@
 //chrome.runtime.connect({ name: "googleautoformfillerPopup" });
 
+// Port to the service worker for save-on-close. Opened in window.onload and
+// streamed to from SaveData so the worker can flush the last state on close.
+let port = null;
+
 window.onload = function() {
+    // Open the save-on-close port to the service worker.
+    port = chrome.runtime.connect({ name: "popupSession" });
+
     document.getElementById("addRowBtn").addEventListener("click", () => AddNewEntry());
     document.getElementById("donate-btn").addEventListener("click", () => window.open("https://buymeacoffee.com/muratserhatalperen", "_blank"));
     document.getElementById("share-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller", "_blank"));
@@ -191,6 +198,12 @@ function SaveData() {
         }
     });
 
+    // Stream the latest snapshot to the service worker so it can flush it on
+    // popup close. The port may be closed during teardown — swallow that.
+    try {
+        port.postMessage({ type: "formData", data: formData });
+    } catch (e) {}
+
     // Save data and fill the forms (without trying to trigger content script)
     GFAFStorage.setFormData(formData, (error) => {
         if (error) {
@@ -211,7 +224,6 @@ function SaveData() {
  */
 function DisplayData() {
     GFAFStorage.getFormData(function(error, formData) {
-        console.log("formData");
         if (objectIsEmpty(formData)) {
             AddNewEntry(); // Add an empty row if there is no data
         } else {

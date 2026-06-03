@@ -29,6 +29,10 @@
         "default_popup": "popup/menu.html"
     },
 
+    "background": {
+        "service_worker": "background.js"
+    },
+
     "content_scripts": [
         {
             "matches": ["*://docs.google.com/forms/*"],
