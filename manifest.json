@@ -33,6 +33,7 @@
         {
             "matches": ["*://docs.google.com/forms/*"],
             "js": [
+                "scripts/storage.js",
                 "scripts/GoogleForm.js"
             ]
         }

@@ -61,20 +61,27 @@ function processCSVFile(file, overwrite, callback) {
         return;
       }
       
-      // Get existing data and merge
-      chrome.storage.sync.get("formData", (result) => {
-        const existingData = result.formData || {};
-        let mergedData = { ...existingData };
-        
+      // Get existing data and merge (via shared helper so lastError is checked)
+      GFAFStorage.getFormData((getErr, existingData) => {
+        let mergedData = { ...(existingData || {}) };
+
         // Merge data based on overwrite preference
         for (const key in newData) {
           if (overwrite || !mergedData[key]) {
             mergedData[key] = newData[key];
           }
         }
-        
-        // Save merged data
-        chrome.storage.sync.set({ "formData": mergedData }, () => {
+
+        // Save merged data; surface a write failure instead of reporting success
+        GFAFStorage.setFormData(mergedData, (setErr) => {
+          if (setErr) {
+            callback({
+              success: false,
+              message: `Failed to save imported data: ${setErr.message}`,
+              data: {}
+            });
+            return;
+          }
           callback({
             success: true,
             message: `Successfully imported ${Object.keys(newData).length} entries`,
@@ -116,7 +123,9 @@ window.onload = function() {
         }
     });
 
-    DisplayData();
+    GFAFStorage.migrateSyncToLocal(() => {
+        DisplayData();
+    });
 }
 
 /**
@@ -262,7 +271,11 @@ function SaveData() {
     });
 
     // Save data and fill the forms (without trying to trigger content script)
-    chrome.storage.sync.set({ "formData": formData }, () => {
+    GFAFStorage.setFormData(formData, (error) => {
+        if (error) {
+            console.warn("Failed to save form data: " + error.message);
+            return;
+        }
         // Only try to fill forms if we're on a Google Forms page
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs[0] && tabs[0].url && tabs[0].url.includes("docs.google.com/forms")) {
@@ -276,8 +289,7 @@ function SaveData() {
  * Displays the data on the table
  */
 function DisplayData() {
-    chrome.storage.sync.get("formData", function(result) {
-        const formData = result["formData"];
+    GFAFStorage.getFormData(function(error, formData) {
         console.log("formData");
         if (objectIsEmpty(formData)) {
             AddNewEntry(); // Add an empty row if there is no data

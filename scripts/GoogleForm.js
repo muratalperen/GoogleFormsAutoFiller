@@ -107,12 +107,12 @@ let form;
 * Fills inputs on forms page with the data
 */
 function FillGoogleForms() {
-    chrome.storage.sync.get("formData", (result) => {
-        if (!result["formData"]) {
+    GFAFStorage.getFormData((error, formData) => {
+        if (error || !formData || Object.keys(formData).length === 0) {
             console.log("No form data found in storage.");
             return;
         }
-        OnDataFetch(result["formData"]);
+        OnDataFetch(formData);
     });
 
     function OnDataFetch(formData) {
@@ -156,7 +156,9 @@ function OnPageLoad() {
     if (!form) {
         console.error("Form couldn't found. GoogleAutoFormFiller exiting...");
     } else {
-        FillGoogleForms();
+        GFAFStorage.migrateSyncToLocal(() => {
+            FillGoogleForms();
+        });
         ObserveFormChanges();
     }
 }
