@@ -105,13 +105,56 @@ function findBestMatch(title, formData) {
 }
 
 /**
-* Calculate similarity percent
+* Calculate similarity percent.
+*
+* Returns the better of two scores so verbose form titles still match short
+* saved keys without dropping the threshold:
+*   - whole-string: normalized Levenshtein over the full strings. Handles
+*     punctuation-level differences ("e-mail" vs "email").
+*   - token-coverage: when one side is a multi-word phrase ("Email Address"),
+*     match it against a shorter key ("Email") if every token of the shorter
+*     side clears the threshold against some token of the longer side.
+* Whitespace-only tokenization keeps "e-mail" a single token, so the
+* whole-string path still owns the punctuation case.
 */
 function CalculateSimilarity(a, b) {
+    return Math.max(wholeStringSimilarity(a, b), tokenCoverageSimilarity(a, b));
+}
+
+/**
+* Normalized Levenshtein similarity over the full strings.
+*/
+function wholeStringSimilarity(a, b) {
     const maxLength = Math.max(a.length, b.length);
     if (maxLength === 0) return 100; // two empty strings are identical
     const distance = levenshteinDistance(a, b);
     return (1 - distance / maxLength) * 100;
+}
+
+/**
+* Coverage of the shorter token list by the longer one. Every token on the
+* shorter side must have a whole-string match above `threshold` among the
+* longer side's tokens; the score is the mean of those best per-token matches.
+* Returns 0 if any token is uncovered (so it never lowers the final max).
+*/
+function tokenCoverageSimilarity(a, b) {
+    const ta = a.split(/\s+/).filter(Boolean);
+    const tb = b.split(/\s+/).filter(Boolean);
+    if (ta.length === 0 || tb.length === 0) return 0;
+
+    const [few, many] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+
+    let total = 0;
+    for (const token of few) {
+        let best = 0;
+        for (const candidate of many) {
+            const score = wholeStringSimilarity(token, candidate);
+            if (score > best) best = score;
+        }
+        if (best <= threshold) return 0; // an uncovered token -> no coverage match
+        total += best;
+    }
+    return total / few.length;
 }
 
 
