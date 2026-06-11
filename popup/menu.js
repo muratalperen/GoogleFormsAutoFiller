@@ -1,44 +1,185 @@
 //chrome.runtime.connect({ name: "googleautoformfillerPopup" });
+
+// Port to the service worker for save-on-close. Opened in window.onload and
+// streamed to from SaveData so the worker can flush the last state on close.
+let port = null;
+
 window.onload = function() {
+    // Open the save-on-close port to the service worker.
+    port = chrome.runtime.connect({ name: "popupSession" });
+
     document.getElementById("addRowBtn").addEventListener("click", () => AddNewEntry());
     document.getElementById("donate-btn").addEventListener("click", () => window.open("https://buymeacoffee.com/muratserhatalperen", "_blank"));
     document.getElementById("share-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller", "_blank"));
     document.getElementById("info-btn").addEventListener("click", () => window.open("https://github.com/muratalperen/GoogleFormsAutoFiller/blob/master/Readme.md", "_blank"));
+    
+    // CSV Import functionality
+    document.getElementById("uploadCsvBtn").addEventListener("click", handleCsvUpload);
+    document.getElementById("csvFile").addEventListener("change", function() {
+        if (this.files.length > 0) {
+            showStatus(`File "${this.files[0].name}" selected. Click "Upload CSV" to import.`, true);
+        }
+    });
 
-    DisplayData();
+    // Date-format setting
+    setupDateFormatSetting();
+
+    GFAFStorage.migrateSyncToLocal(() => {
+        DisplayData();
+    });
 }
 
+/**
+ * Populate the date-format select from stored settings and persist on change.
+ */
+function setupDateFormatSetting() {
+    const select = document.getElementById("dateFormat");
+    if (!select) return;
+
+    GFAFStorage.getSettings((error, settings) => {
+        select.value = (settings && settings.dateFormat) || "DMY";
+    });
+
+    select.addEventListener("change", function() {
+        GFAFStorage.setSettings({ dateFormat: select.value }, (error) => {
+            if (error) {
+                showStatus("Failed to save setting: " + error.message, false);
+                return;
+            }
+            // Re-fill the active Google Forms tab so the new format applies.
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0] && tabs[0].url && tabs[0].url.includes("docs.google.com/forms")) {
+                    FillGoogleForms();
+                }
+            });
+        });
+    });
+}
 
 /**
- * Adds a new row to the form using the template
+ * Handle CSV file upload button click
+ */
+function handleCsvUpload() {
+    const fileInput = document.getElementById("csvFile");
+    const overwriteCheckbox = document.getElementById("overwriteExisting");
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        showStatus("Please select a CSV file first", false);
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const overwrite = overwriteCheckbox.checked;
+    
+    // Show loading status
+    showStatus("Importing data...", true);
+    
+    // Process the CSV file
+    GFAFCsv.processCSVFile(file, overwrite, function(result) {
+        showStatus(result.message, result.success);
+        
+        if (result.success) {
+            // Clear the form and display the new data
+            clearFormData();
+            DisplayData();
+            fileInput.value = ""; // Clear the file input
+        }
+    });
+}
+
+/**
+ * Show status message
+ * @param {string} message - The message to display
+ * @param {boolean} isSuccess - Whether it's a success or error message
+ */
+function showStatus(message, isSuccess) {
+    const statusElement = document.getElementById("importStatus");
+    if (!statusElement) return;
+    
+    statusElement.textContent = message;
+    statusElement.className = "status-message " + (isSuccess ? "success" : "error");
+    statusElement.style.display = "block";
+    
+    // Hide status after 5 seconds
+    setTimeout(() => {
+        statusElement.style.display = "none";
+    }, 5000);
+}
+
+/**
+ * Clear all form rows
+ */
+function clearFormData() {
+    const formElement = document.getElementById("formData");
+    if (!formElement) return;
+    
+    while (formElement.firstChild) {
+        formElement.removeChild(formElement.firstChild);
+    }
+}
+
+/**
+ * Creates and returns a new form row element
+ * @param {String} key Key data
+ * @param {String} val Value data
+ * @returns {HTMLElement} The created row element
+ */
+function createFormRow(key = "", val = "") {
+    const row = document.createElement('div');
+    row.className = 'form-row';
+    
+    // Create key input
+    const keyInput = document.createElement('input');
+    keyInput.type = 'text';
+    keyInput.name = 'key[]';
+    keyInput.placeholder = 'Key';
+    keyInput.className = 'key-input';
+    keyInput.value = key;
+    keyInput.addEventListener('change', SaveData);
+    
+    // Create value input
+    const valueInput = document.createElement('input');
+    valueInput.type = 'text';
+    valueInput.name = 'value[]';
+    valueInput.placeholder = 'Value';
+    valueInput.className = 'value-input';
+    valueInput.value = val;
+    valueInput.addEventListener('change', SaveData);
+    
+    // Create remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '-';
+    removeBtn.addEventListener('click', function() {
+        row.remove();
+        SaveData();
+    });
+    
+    // Append elements to row
+    row.appendChild(keyInput);
+    row.appendChild(valueInput);
+    row.appendChild(removeBtn);
+    
+    return row;
+}
+
+/**
+ * Adds a new row to the form
  * @param {String} key Key data
  * @param {String} val Value data
  */
 function AddNewEntry(key = "", val = "") {
-    const template = document.getElementById("formRowTemplate");
     const formElement = document.getElementById("formData");
-
-    // Clone the template content
-    const newRow = template.content.cloneNode(true);
-
-    const inputs = newRow.querySelectorAll("input");
-    inputs[0].value = key;
-    inputs[1].value = val;
-    inputs[0].addEventListener("change", SaveData);
-    inputs[1].addEventListener("change", SaveData);
-
-    // Add remove functionality to the button
-    const removeButton = newRow.querySelector(".remove-btn");
-    removeButton.addEventListener("click", () => {
-        removeButton.parentElement.remove();
-        SaveData();
-    });
-
-    // Append the new row to the form
+    if (!formElement) {
+        console.error("Form data container not found!");
+        return;
+    }
+    
+    const newRow = createFormRow(key, val);
     formElement.appendChild(newRow);
     SaveData();
 }
-
 
 /**
 * Saves the data on table to chrome storage
@@ -52,45 +193,67 @@ function SaveData() {
         const valueInput = row.querySelector('input[name="value[]"]');
 
         // If both key and value inputs have values, save them
-        if (keyInput.value.trim() && valueInput.value.trim()) {
+        if (keyInput && valueInput && keyInput.value.trim() && valueInput.value.trim()) {
             formData[keyInput.value.trim()] = valueInput.value.trim();
         }
     });
 
-    // Save data and fill the forms
-    chrome.storage.sync.set({ "formData": formData }, FillGoogleForms);
+    // Stream the latest snapshot to the service worker so it can flush it on
+    // popup close. The port may be closed during teardown — swallow that.
+    try {
+        port.postMessage({ type: "formData", data: formData });
+    } catch (e) {}
+
+    // Save data and fill the forms (without trying to trigger content script)
+    GFAFStorage.setFormData(formData, (error) => {
+        if (error) {
+            console.warn("Failed to save form data: " + error.message);
+            return;
+        }
+        // Only try to fill forms if we're on a Google Forms page
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0] && tabs[0].url && tabs[0].url.includes("docs.google.com/forms")) {
+                FillGoogleForms();
+            }
+        });
+    });
 }
 
 /**
  * Displays the data on the table
  */
 function DisplayData() {
-    chrome.storage.sync.get("formData", function(result) {
-        const formData = result["formData"];
-        console.log("formData");
+    GFAFStorage.getFormData(function(error, formData) {
         if (objectIsEmpty(formData)) {
             AddNewEntry(); // Add an empty row if there is no data
         } else {
-            for (key in formData) {
+            for (const key in formData) {
                 AddNewEntry(key, formData[key]);
             }
         }
     });
 }
 
-
 /**
  * Fills the google forms with the data
  */
 function FillGoogleForms() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (!tabs[0]) return;
+        
         chrome.tabs.sendMessage(tabs[0].id, { action: 'FillGoogleForms' }, (response) => {
-          //console.log(response.status);
+            // Handle the error silently - we don't need to show this to the user
+            if (chrome.runtime.lastError) {
+                console.log("Communication error: " + chrome.runtime.lastError.message);
+                return;
+            }
+            // Process response if needed
+            if (response && response.status) {
+                console.log("Form fill status: " + response.status);
+            }
         });
     });
 }
-
-
 
 /**
 * Checks if parameter object is empty, null etc.
