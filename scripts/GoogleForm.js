@@ -97,9 +97,9 @@ function FillGoogleForms() {
             const fields = form.querySelectorAll(handler.selector);
             fields.forEach(field => {
                 const formTitleElement = field.closest("div[role='listitem']")?.querySelector("div[role='heading']");
-                if (!formTitleElement || !formTitleElement.firstChild) return;
+                if (!formTitleElement || !formTitleElement.textContent) return;
 
-                const formTitle = formTitleElement.firstChild.textContent.trim();
+                const formTitle = formTitleElement.textContent.trim();
                 const bestMatch = GetBestMatch(formTitle, formData);
                 if (bestMatch) {
                     const answer = formData[bestMatch];
