@@ -21,15 +21,15 @@ export const Handlers = {
             // Ensure the date is in YYYY-MM-DD format for HTML date input
             let formattedDate = answer;
             
-            // Check if the answer is in DD/MM/YYYY or MM/DD/YYYY format and convert to YYYY-MM-DD
+            // Check if the answer is in DD/MM/YYYY or MM/DD/YYYY format and convert to YYYY-MM-DD.
+            // Both formats share the same shape, so disambiguate using the value: whichever
+            // part can't be a month (>12) must be the day. Ambiguous dates default to DD/MM/YYYY.
             if (answer.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
                 const parts = answer.split(/[\/\-\.]/);
-                // Assuming DD/MM/YYYY format - adjust as needed for your locale
-                formattedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-            } else if (answer.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
-                const parts = answer.split(/[\/\-\.]/);
-                // Assuming MM/DD/YYYY format
-                formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                const first = parseInt(parts[0], 10);
+                const second = parseInt(parts[1], 10);
+                const [day, month] = first > 12 ? [first, second] : second > 12 ? [second, first] : [first, second];
+                formattedDate = `${parts[2]}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             }
             
             // Set the value and dispatch events
